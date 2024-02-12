@@ -44,6 +44,6 @@ ax.legend(frameon = False)
 ax.set(xlabel = 'm/z', ylabel = 'Relative intensity', yscale = 'log') #, xlim = (190, 210))
 
 fig.tight_layout()
-fig.savefig('MW200.png', dpi = 200)
+fig.savefig('MW202.png', dpi = 200)
 plt.show()
 # %%
