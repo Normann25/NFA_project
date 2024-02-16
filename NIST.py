@@ -7,53 +7,47 @@ from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import os
 #%%
-path = './NIST_data/'
-files = os.listdir(path)
-data_dict = {}
+def read_NIST(path):
+    files = os.listdir(path)
+    data_dict = {}
 
-for file in files:
-    with open(os.path.join(path, file))as f:
-        df = pd.read_table(f, sep = '\s+', skiprows=25, header=None)[:-1]
-        df2 = pd.DataFrame(df.stack())
-        df3 = pd.DataFrame(df2[0].str.split(',', expand = True).reset_index(drop=True)) #.sort_values(0)
-        df3.columns = ['mass', 'intensity']
-        data_dict[file] = df3
-
-print(data_dict)
-# print(data_dict['Fluoranthene.jdx'])
+    for file in files:
+        with open(os.path.join(path, file))as f:
+            df = pd.read_table(f, sep = '\s+', skiprows=25, header=None)[:-1]
+            df2 = pd.DataFrame(df.stack())
+            df3 = pd.DataFrame(df2[0].str.split(',', expand = True).reset_index(drop=True)) #.sort_values(0)
+            df3.columns = ['mass', 'intensity']
+            data_dict[file] = df3
+    
+    return data_dict
 #%%
-print(len(data_dict['Pyrene.jdx']['mass']))
-print(len(data_dict['Pyrene.jdx']['intensity']))
-print(len(pd.to_numeric(data_dict['Pyrene.jdx']['intensity']) / 10))
-#%%
+def plot_NIST(species_list, data, width, ax, xlim, ylim):
+    data_labels = []
+    for specie in species_list:
+        label = ''.join([specie, '.jdx'])
+        data_labels.append(label)
+    
+    # Find a better, more effiecient way to merge the dataframes
+    if len(data_labels) == 2:
+        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], on = 'mass')    
+    if len(data_labels) == 3:
+        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], data[data_labels[2]], on = 'mass')
+    if len(data_labels) == 4:
+        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], data[data_labels[2]], data[data_labels[3]], on = 'mass')
+    if len(data_labels) == 5:
+        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], data[data_labels[2]], data[data_labels[3]], data[data_labels[4]], on = 'mass')
+    
+    for key in merged.keys():
+        merged[key] = pd.to_numeric(merged[key])
+    
+    bottom = np.zeros(len(merged['mass']))
 
-bob = pd.merge(data_dict['Pyrene.jdx'], data_dict['Fluoranthene.jdx'], on='mass')
-bob['intensity_x'] = pd.to_numeric(bob['intensity_x'])
-bob['intensity_y'] = pd.to_numeric(bob['intensity_y'])
-bob['pyrene+fluoranthracene'] = bob['intensity_x'] + bob['intensity_y']
-bob['mass'] = pd.to_numeric(bob['mass'])
-print(bob.head())
-fig, ax = plt.subplots(figsize = (6.3, 3))
+    for i, key in enumerate(merged.keys()[1:]):
+        y = merged[key] / 100
+        x = merged['mass']
 
-df = pd.DataFrame()
-species = ['Pyrene', 'Fluoranthene']
-width = 0.5
-bottom = np.zeros(100)
+        ax.bar(x, y, width, label = species_list[i], bottom = bottom)
+        bottom += y
 
-#for specie in species:
-#    data = data_dict[''.join([specie, '.jdx'])]
-#    y = pd.to_numeric(data['intensity']) / 100
-#    x = pd.to_numeric(data['mass'])
-#    
-#    ax.bar(x, y, width, label = specie) #, bottom = bottom)
-    # bottom += y
-ax.bar(bob['mass'], bob['intensity_x'] / 100, label='Pyrene')
-ax.bar(bob['mass'], bob['intensity_y'] / 100, bottom=bob['intensity_x'] / 100, label='Fluoroanthracene')
-
-ax.legend(frameon = False)
-ax.set(xlabel = 'm/z', ylabel = 'Relative intensity', xlim = (190, 210)) #, yscale = 'log') #
-
-fig.tight_layout()
-fig.savefig('MW202.png', dpi = 200)
-plt.show()
-# %%
+        ax.legend(frameon = False)
+        ax.set(xlabel = 'm/z', ylabel = 'Relative intensity', xlim = xlim, ylim = ylim)
