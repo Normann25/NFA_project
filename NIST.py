@@ -28,20 +28,33 @@ def plot_NIST(species_list, data, width, ax, xlim, ylim):
         data_labels.append(label)
     
     # Find a better, more effiecient way to merge the dataframes
+    if len(data_labels) == 1:
+        merged = data[data_labels[0]]
     if len(data_labels) == 2:
-        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], on = 'mass')    
+        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], on = 'mass', how = 'outer')    
     if len(data_labels) == 3:
-        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], data[data_labels[2]], on = 'mass')
+        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], on = 'mass', how = 'outer')
+        merged = pd.merge(merged, data[data_labels[2]], on = 'mass', how = 'outer')
     if len(data_labels) == 4:
-        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], data[data_labels[2]], data[data_labels[3]], on = 'mass')
+        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], on = 'mass', how = 'outer')
+        merged = pd.merge(merged, data[data_labels[2]], on = 'mass', how = 'outer')
+        merged = pd.merge(merged, data[data_labels[3]], on = 'mass', how = 'outer')
     if len(data_labels) == 5:
-        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], data[data_labels[2]], data[data_labels[3]], data[data_labels[4]], on = 'mass')
-    else:
-        merged = data[data_labels]
-    
+        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], on = 'mass', how = 'outer')
+        merged = pd.merge(merged, data[data_labels[2]], on = 'mass', how = 'outer')
+        merged = pd.merge(merged, data[data_labels[3]], on = 'mass', how = 'outer')
+        merged = pd.merge(merged, data[data_labels[4]], on = 'mass', how = 'outer')
+
+    # print(merged)
+    # print(len(merged['mass']))
+
     for key in merged.keys():
         merged[key] = pd.to_numeric(merged[key])
+        merged[key] = merged[key].fillna(0)
     
+    # print(merged)
+    # print(len(merged['mass']))
+
     bottom = np.zeros(len(merged['mass']))
 
     for i, key in enumerate(merged.keys()[1:]):
