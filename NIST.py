@@ -24,7 +24,7 @@ def read_NIST(path):
 def plot_NIST(species_list, data, width, ax, xlim, ylim):
     data_labels = []
     for specie in species_list:
-        label = ''.join([specie, '.jdx'])
+        label = ''.join([specie, '.txt'])
         data_labels.append(label)
     
     # Find a better, more effiecient way to merge the dataframes
@@ -36,6 +36,8 @@ def plot_NIST(species_list, data, width, ax, xlim, ylim):
         merged = pd.merge(data[data_labels[0]], data[data_labels[1]], data[data_labels[2]], data[data_labels[3]], on = 'mass')
     if len(data_labels) == 5:
         merged = pd.merge(data[data_labels[0]], data[data_labels[1]], data[data_labels[2]], data[data_labels[3]], data[data_labels[4]], on = 'mass')
+    else:
+        merged = data[data_labels]
     
     for key in merged.keys():
         merged[key] = pd.to_numeric(merged[key])
