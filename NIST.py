@@ -21,7 +21,7 @@ def read_NIST(path):
     
     return data_dict
 #%%
-def plot_NIST(species_list, data, width, ax, xlim, ylim):
+def merge_NIST(species_list, data):
     data_labels = []
     for specie in species_list:
         label = ''.join([specie, '.txt'])
@@ -45,15 +45,14 @@ def plot_NIST(species_list, data, width, ax, xlim, ylim):
         merged = pd.merge(merged, data[data_labels[3]], on = 'mass', how = 'outer')
         merged = pd.merge(merged, data[data_labels[4]], on = 'mass', how = 'outer')
 
-    # print(merged)
-    # print(len(merged['mass']))
-
     for key in merged.keys():
         merged[key] = pd.to_numeric(merged[key])
         merged[key] = merged[key].fillna(0)
-    
-    # print(merged)
-    # print(len(merged['mass']))
+
+    return merged
+#%%
+def plot_NIST(species_list, data, width, ax, xlim, ylim):
+    merged = merge_NIST(species_list, data)
 
     bottom = np.zeros(len(merged['mass']))
 
@@ -66,3 +65,17 @@ def plot_NIST(species_list, data, width, ax, xlim, ylim):
 
         ax.legend(frameon = False)
         ax.set(xlabel = 'm/z', ylabel = 'Relative intensity', xlim = xlim, ylim = ylim)
+#%%
+def sum_columns_NIST(species_list, data):
+    merged = merge_NIST(species_list, data)
+
+    full_sum = np.zeros(len(species_list))
+    sum_non_MolIon = np.zeros(len(species_list))
+    relative_intensity = np.zeros(len(species_list))
+
+    for i, key in enumerate(merged.keys()[1:]):
+        full_sum[i] += np.sum(merged[key])
+        sum_non_MolIon[i] += full_sum[i] - max(merged[key])
+        relative_intensity[i] += sum_non_MolIon[i] / max(merged[key])
+    
+    return full_sum, sum_non_MolIon, relative_intensity
