@@ -12,11 +12,11 @@ def read_NIST(path):
     data_dict = {}
 
     for file in files:
-        with open(os.path.join(path, file))as f:
+        with open(os.path.join(path, file)) as f:
             df = pd.read_table(f, sep = '\s+', skiprows=25, header=None)[:-1]
             df2 = pd.DataFrame(df.stack())
             df3 = pd.DataFrame(df2[0].str.split(',', expand = True).reset_index(drop=True)) #.sort_values(0)
-            df3.columns = ['mass', 'intensity']
+            df3.columns = ['mass', 'intensity'.join(file)]
             data_dict[file] = df3
     
     return data_dict
