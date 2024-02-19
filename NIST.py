@@ -68,3 +68,15 @@ def sum_columns_NIST(species_list, data):
         relative_intensity[i] += sum_non_MolIon[i] / max(merged[key])
     
     return full_sum, sum_non_MolIon, relative_intensity
+#%%
+def sum_vs_molion(species_full, MWs, data):
+    sums = pd.DataFrame(columns = ['Species', 'Molecular weight', 'Full sum', 'Non molecular ion', 'Relative intensity'])
+
+    for i, specie in enumerate(species_full):
+        MW = MWs[i]
+        full, nonMol, Rel = sum_columns_NIST(specie, data)
+        for i, f in enumerate(full):
+            new_row = {'Species': specie[i], 'Molecular weight': MW, 'Full sum': full[i], 'Non molecular ion': nonMol[i], 'Relative intensity': Rel[i]}
+            sums = pd.concat([sums, pd.DataFrame([new_row])], ignore_index=True)
+    
+    return sums
