@@ -16,7 +16,11 @@ def read_NIST(path):
             df = pd.read_table(f, sep = '\s+', skiprows=25, header=None)[:-1]
             df2 = pd.DataFrame(df.stack())
             df3 = pd.DataFrame(df2[0].str.split(',', expand = True).reset_index(drop=True)) #.sort_values(0)
-            df3.columns = ['mass', 'intensity'.join(file)]
+            df3.columns = ['mass', ('intensity' + file)]
+
+            for key in df3.keys():
+                df3[key] = pd.to_numeric(df3[key])
+
             data_dict[file] = df3
     
     return data_dict
@@ -24,29 +28,14 @@ def read_NIST(path):
 def merge_NIST(species_list, data):
     data_labels = []
     for specie in species_list:
-        label = ''.join([specie, '.txt'])
+        label = specie + '.txt'
         data_labels.append(label)
     
-    # Find a better, more effiecient way to merge the dataframes
-    if len(data_labels) == 1:
-        merged = data[data_labels[0]]
-    if len(data_labels) == 2:
-        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], on = 'mass', how = 'outer')    
-    if len(data_labels) == 3:
-        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], on = 'mass', how = 'outer')
-        merged = pd.merge(merged, data[data_labels[2]], on = 'mass', how = 'outer')
-    if len(data_labels) == 4:
-        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], on = 'mass', how = 'outer')
-        merged = pd.merge(merged, data[data_labels[2]], on = 'mass', how = 'outer')
-        merged = pd.merge(merged, data[data_labels[3]], on = 'mass', how = 'outer')
-    if len(data_labels) == 5:
-        merged = pd.merge(data[data_labels[0]], data[data_labels[1]], on = 'mass', how = 'outer')
-        merged = pd.merge(merged, data[data_labels[2]], on = 'mass', how = 'outer')
-        merged = pd.merge(merged, data[data_labels[3]], on = 'mass', how = 'outer')
-        merged = pd.merge(merged, data[data_labels[4]], on = 'mass', how = 'outer')
+    merged = pd.DataFrame({'mass':[]})
+    for label in data_labels:
+        merged = pd.merge(merged, data[label], on = 'mass', how = 'outer')
 
     for key in merged.keys():
-        merged[key] = pd.to_numeric(merged[key])
         merged[key] = merged[key].fillna(0)
 
     return merged
