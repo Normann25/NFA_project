@@ -34,4 +34,4 @@ def plot_overview(ax, df):
     ax.xaxis.set_major_formatter(formatter)
 
     ax.legend(frameon = False, fontsize = 8)
-    ax.set(ylabel = 'Total ion current', xlabel = 'Time')
+    ax.set(ylabel = 'Intensity', xlabel = 'Time')
