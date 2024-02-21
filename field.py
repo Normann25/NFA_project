@@ -19,14 +19,14 @@ def read_data(path):
 
             df['Time'] = pd.to_timedelta(df['t_base'].str.split().str[1]).astype('timedelta64[s]')
             df = df.set_index('Time')
-            df = df.drop('t_base', axis = 'columns')
+            # df = df.drop('t_base', axis = 'columns')
 
         data_dict[name] = df
     
     return data_dict
 #%%
 def plot_overview(ax, df):
-    summed = df[df.keys()[1:]].sum(axis='columns')
+    summed = df[df.keys()[2:]].sum(axis='columns')
     ax.plot(df.index, df['Total ion current'], lw = 1, label = 'Total ion current')
     ax.plot(df.index, summed, lw = 1, label = 'Summed columns')
 
