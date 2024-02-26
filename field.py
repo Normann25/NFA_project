@@ -35,7 +35,7 @@ def read_data(path, parent_path):
     return data_dict
 #%%
 def plot_overview(ax, df):
-    ax.plot(df.index, df['Total ion current'], lw = 1, label = 'Total ion current')
+    # ax.plot(df.index, df['Total ion current'], lw = 1, label = 'Total ion current')
     ax.plot(df.index, df['Sum'], lw = 1, label = 'Summed columns')
 
     formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
