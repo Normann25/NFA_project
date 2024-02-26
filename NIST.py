@@ -115,4 +115,6 @@ def Fracmentation_factor(species_list, data, molecular_weights):
             new_row = {'Species': specie[j], 'Molecular weight': MW, 'Full sum': f, 'Molecular ion': sum_MolIon[j], 'Fragmentation factor': FF[j]}
             sums = pd.concat([sums, pd.DataFrame([new_row])], ignore_index=True)
 
+    sums = sums.set_index('Species')
+
     return sums
