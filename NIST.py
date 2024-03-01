@@ -96,17 +96,17 @@ def Fracmentation_factor(species_list, data, molecular_weights):
         for j, key in enumerate(merged.keys()[1:]):
             mol_idx = merged[key].idxmax()
             
-            # Main_group = []
+            Main_group = []
 
-            # for i in range(len(merged[key][:mol_idx])):
-            #     rel_int = merged[key][mol_idx-i]
-            #     if rel_int != 0:
-            #         Main_group.append(rel_int)
-            #     if rel_int == 0:
-            #         break
-            # for i in range(len(merged[key])):
-            #     if i > mol_idx:
-            #         Main_group.append(merged[key][i])
+            for i in range(len(merged[key][:mol_idx-1])):
+                rel_int = merged[key][mol_idx-i]
+                if rel_int != 0:
+                    Main_group.append(rel_int)
+                if rel_int == 0:
+                    break
+            for i in range(len(merged[key])):
+                if i > mol_idx:
+                    Main_group.append(merged[key][i])
 
             main = merged[key][mol_idx] + merged[key][mol_idx+1] + merged[key][mol_idx-1] + merged[key][mol_idx+2] + merged[key][mol_idx-2]
 
