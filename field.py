@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import time
+from datetime import datetime
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
@@ -47,7 +48,9 @@ def read_csv(path, parent_path):
             df = pd.read_csv(f)
             df = df.dropna()
 
-            df['Time'] = pd.to_timedelta(df['t_base'].str.split().str[1]).astype('timedelta64[s]')
+            df['t_base'] = df['t_base'].str.split().str[1] + pd.Timedelta('2 hours')
+            # df['t_base'] = (df['t_base'].apply(lambda x: datetime.strptime(x, "%H:%M")) + pd.Timedelta("1 hour")).apply(lambda y: datetime.strftime(y, "%H:%M"))
+            df['Time'] = pd.to_timedelta(df['t_base']).astype('timedelta64[s]')     # .str.split().str[1]
             df = df.set_index('Time')
 
         data_dict[name] = df
@@ -75,6 +78,10 @@ def read_csv_BC(path, parent_path, bc_station):
                         columns = ['Time local (hh:mm:ss)', 'Sample temp (C)', 'Sample RH (%)', 'UV BCc', 'Blue BCc', 'Green BCc', 'Red BCc', 'IR BCc']
                         for col in columns:
                             new_df[col] = df[col]
+                        
+                        new_df['Time'] = pd.to_timedelta(new_df['Time local (hh:mm:ss)']).astype('timedelta64[s]')  # .str.split().str[1]
+                        new_df = new_df.set_index('Time')
+
                         new_df = new_df.dropna()
 
                     data_dict[name] = new_df
