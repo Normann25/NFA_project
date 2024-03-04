@@ -54,6 +54,33 @@ def read_csv(path, parent_path):
     
     return data_dict
 
+def read_csv_BC(path, parent_path, bc_station):
+    parentPath = os.path.abspath(parent_path)
+    if parentPath not in sys.path:
+        sys.path.insert(0, parentPath)
+    
+    files = os.listdir(path)
+    data_dict = {}
+
+    for file in files:
+        if '.csv' in file:
+            for st in bc_station:
+                if st in file:
+                    name = file.split('.')[0]
+                    name = name.split('_')[-1]
+                    with open(os.path.join(path, file)) as f:
+                        df = pd.read_csv(f)
+
+                        new_df = pd.DataFrame()
+                        columns = ['Time local (hh:mm:ss)', 'Sample temp (C)', 'Sample RH (%)', 'UV BCc', 'Blue BCc', 'Green BCc', 'Red BCc', 'IR BCc']
+                        for col in columns:
+                            new_df[col] = df[col]
+                        new_df = new_df.dropna()
+
+                    data_dict[name] = new_df
+    
+    return data_dict 
+
 def plot_test(ax, df):
     df['Sum'] = df[df.keys()[2:]].sum(axis='columns')  
 
