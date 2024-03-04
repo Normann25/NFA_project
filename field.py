@@ -123,9 +123,9 @@ def plot_PAH_ACSM(ax, df, ncol):
     ax.set(ylabel = 'Intensity', xlabel = 'Time')
 
 def plot_ACSM_BC(ax, df_ACSM, df_BC, n):
-    p1, = ax.plot(df_ACSM.index, df_ACSM['Org_11000'], lw = 1, label = 'Org from ACSM', color = 'tab:blue')
+    p1, = ax.plot(df_ACSM.index, df_ACSM['Org_11000'], lw = 1, label = 'Organic carbon', color = 'tab:blue')
     ax2 = ax.twinx()
-    p2, = ax2.plot(df_BC.index, df_BC['IR BCc'], lw = 1, label = 'IR BCc from MA', color = 'tab:orange')
+    p2, = ax2.plot(df_BC.index, df_BC['IR BCc'], lw = 1, label = 'Black carbon', color = 'tab:orange')
 
     formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
     ax.xaxis.set_major_formatter(formatter)
