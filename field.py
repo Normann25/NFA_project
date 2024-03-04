@@ -53,7 +53,7 @@ def read_csv(path, parent_path):
         data_dict[name] = df
     
     return data_dict
-#%%
+
 def plot_test(ax, df):
     df['Sum'] = df[df.keys()[2:]].sum(axis='columns')  
 
@@ -64,10 +64,21 @@ def plot_test(ax, df):
 
     ax.legend(frameon = False, fontsize = 8)
     ax.set(ylabel = 'Intensity', xlabel = 'Time')
-#%%
+
 def plot_overview(ax, df, ncol):
     for key in df.keys()[1:]:
         ax.plot(df.index, df[key], lw = 1, label = key)
+
+    formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
+    ax.xaxis.set_major_formatter(formatter)
+
+    ax.legend(frameon = False, fontsize = 8, ncol = ncol)
+    ax.set(ylabel = 'Intensity', xlabel = 'Time')
+
+def plot_PAH_ACSM(ax, df, ncol):
+    for key in df.keys()[1:]:
+        if 'm' in key:
+            ax.plot(df.index, df[key], lw = 1, label = key)
 
     formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
     ax.xaxis.set_major_formatter(formatter)
