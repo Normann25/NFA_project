@@ -22,7 +22,9 @@ def read_data(path, parent_path):
             df = pd.read_csv(f, sep = ';', decimal = ',')
             df = df.dropna()
 
-            df['Time'] = pd.to_timedelta(df['t_base'].str.split().str[1]).astype('timedelta64[s]')
+            df['t_base'] = df['t_base'].str.split().str[1] + pd.Timedelta('2 hours')
+            # df['t_base'] = (df['t_base'].apply(lambda x: datetime.strptime(x, "%H:%M")) + pd.Timedelta("1 hour")).apply(lambda y: datetime.strftime(y, "%H:%M"))
+            df['Time'] = pd.to_timedelta(df['t_base']).astype('timedelta64[s]')     # .str.split().str[1]
             df = df.set_index('Time')
 
             for key in df.keys()[1:]:
@@ -119,3 +121,27 @@ def plot_PAH_ACSM(ax, df, ncol):
 
     ax.legend(frameon = False, fontsize = 8, ncol = ncol)
     ax.set(ylabel = 'Intensity', xlabel = 'Time')
+
+def plot_ACSM_BC(ax, df_ACSM, df_BC, n):
+    p1, = ax.plot(df_ACSM.index, df_ACSM['Org_11000'], lw = 1, label = 'Org from ACSM', color = 'tab:blue')
+    ax2 = ax.twinx()
+    p2, = ax2.plot(df_BC.index, df_BC['IR BCc'], lw = 1, label = 'IR BCc from MA', color = 'tab:orange')
+
+    formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
+    ax.xaxis.set_major_formatter(formatter)
+    ax2.xaxis.set_major_formatter(formatter)
+
+    ylim = np.array(ax2.get_ylim())
+    ratio = ylim / np.sum(np.abs(ylim))
+    scale = ratio / np.min(np.abs(ratio))
+    scale = scale / n
+    ax.set_ylim(np.max(np.abs(ax.get_ylim())) * scale)
+
+    ax.tick_params(axis = 'y', labelcolor = p1.get_color())
+    ax2.tick_params(axis = 'y', labelcolor = p2.get_color())
+
+    ax.legend(frameon = False, fontsize = 8, handles = [p1, p2])
+
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Intensity', color = p1.get_color())
+    ax2.set_ylabel('Mass concentration / $\mu$g/m$^{3}$', color = p2.get_color())
