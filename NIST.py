@@ -82,15 +82,19 @@ def sum_vs_molion(species_full, MWs, data):
     return sums
 #%%
 def Fracmentation_factor(species_list, data, molecular_weights):
-    sums = pd.DataFrame(columns = ['Species', 'Molecular weight', 'Full sum', 'Molecular ion', 'Fragmentation factor', 'MI fraction'])
+    sums = pd.DataFrame(columns = ['Species', 'Molecular weight', 'Full sum', 'MI v1', 'MI v2', 'MI v3', 'FF v1', 'FF v2', 'FF v3', 'MI fraction'])
 
     for i, specie in enumerate(species_list):
         merged = merge_NIST(specie, data)
 
         full_sum = np.zeros(len(specie))
         MI_frac = np.zeros(len(specie))
-        sum_MolIon = np.zeros(len(specie))
-        FF = np.zeros(len(specie))
+        sum_MI_v1 = np.zeros(len(specie))
+        sum_MI_v2 = np.zeros(len(specie))
+        sum_MI_v3 = np.zeros(len(specie))
+        FF_v1 = np.zeros(len(specie))
+        FF_v2 = np.zeros(len(specie))
+        FF_v3 = np.zeros(len(specie))
 
         MW = molecular_weights[i]
 
@@ -111,13 +115,25 @@ def Fracmentation_factor(species_list, data, molecular_weights):
 
             main = merged[key][mol_idx] + merged[key][mol_idx+1] + merged[key][mol_idx-1] + merged[key][mol_idx+2] + merged[key][mol_idx-2]
 
+            main2 = []
+            for i in range(5):
+                main2.append(merged[key][mol_idx-i])
+            main2.append(merged[key][mol_idx+1])
+
             full_sum[j] += np.sum(merged[key])
             MI_frac[j] += merged[key][mol_idx] / full_sum[j]
-            sum_MolIon[j] += main       # np.sum(Main_group)
-            FF[j] += full_sum[j] / sum_MolIon[j]
+
+            sum_MI_v1[j] += np.sum(Main_group)
+            FF_v1[j] += full_sum[j] / sum_MI_v1[j]
+            
+            sum_MI_v2[j] += main
+            FF_v2[j] += full_sum[j] / sum_MI_v2[j]
+
+            sum_MI_v3[j] += np.sum(main2)
+            FF_v3[j] += full_sum[j] / sum_MI_v3[j]
         
         for j, f in enumerate(full_sum):
-            new_row = {'Species': specie[j], 'Molecular weight': MW, 'Full sum': f, 'Molecular ion': sum_MolIon[j], 'Fragmentation factor': FF[j], 'MI fraction': MI_frac[j]}
+            new_row = {'Species': specie[j], 'Molecular weight': MW, 'Full sum': f, 'MI v1': sum_MI_v1[j], 'MI v2': sum_MI_v2[j], 'MI v3': sum_MI_v3[j], 'FF v1': FF_v1[j], 'FF v2': FF_v2[j], 'FF v3': FF_v3[j], 'MI fraction': MI_frac[j]}
             sums = pd.concat([sums, pd.DataFrame([new_row])], ignore_index=True)
 
     sums = sums.set_index('Species')
