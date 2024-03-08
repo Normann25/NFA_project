@@ -8,6 +8,51 @@ import numpy as np
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 import os, sys
 #%%
+def read_MS_txt(path, parent_path):
+    data_dict = {}
+    Trafic_before = {}
+    Asphalt_peak = {}
+    After_AP = {}
+    Trafic_after = {}
+    dictionaries = [Trafic_before, Asphalt_peak, After_AP, Trafic_after]
+    labels = ['Trafic_before', 'Asphalt_peak', 'After_AP', 'Trafic_after']
+
+    
+    parentPath = os.path.abspath(parent_path)
+    if parentPath not in sys.path:
+        sys.path.insert(0, parentPath)
+    
+    files = os.listdir(path)
+
+    for file in files:
+        file_name = file.split('.')[0]
+        name = file_name.split('_')[0] + ' ' + file_name.split('_')[1]
+
+        with open(os.path.join(path, file)) as f:
+            df = pd.read_table(f, sep = '\t')
+            df.columns = ['mass', name]
+
+            if 'TraficBefore' in file:
+                Trafic_before[name] = df
+            if '_Asphalt' in file:
+                Asphalt_peak[name] = df
+            if 'AfterAsphalt' in file:
+                After_AP[name] = df
+            if 'TraficAfter' in file:
+                Trafic_after[name] = df
+
+    for i, label in enumerate(dictionaries):
+        merged = pd.DataFrame({'mass': []})
+        for key in label.keys():
+            merged = pd.merge(merged, label[key], on = 'mass', how = 'outer')
+        
+        for key in merged.keys():
+            merged[key] = merged[key].fillna(0)
+        
+        data_dict[labels[i]] = merged
+    
+    return data_dict
+
 def read_data(path, parent_path):
     parentPath = os.path.abspath(parent_path)
     if parentPath not in sys.path:
@@ -35,7 +80,7 @@ def read_data(path, parent_path):
         data_dict[name] = df
     
     return data_dict
-#%%
+
 def read_csv(path, parent_path):
     parentPath = os.path.abspath(parent_path)
     if parentPath not in sys.path:
