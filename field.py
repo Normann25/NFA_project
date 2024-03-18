@@ -130,6 +130,9 @@ def read_csv_BC(path, parent_path, bc_station):
                         new_df = new_df.set_index('Time')
 
                         new_df = new_df.dropna()
+                        for key in new_df.keys():
+                            if 'BCc' in key:
+                                new_df[key] = new_df[key] / 1000
 
                     data_dict[name] = new_df
     
@@ -167,8 +170,9 @@ def plot_PAH_ACSM(ax, df, ncol):
     ax.legend(frameon = False, fontsize = 8, ncol = ncol)
     ax.set(ylabel = 'Intensity', xlabel = 'Time')
 
-def plot_ACSM_BC(ax, df_ACSM, df_BC, n):
-    p1, = ax.plot(df_ACSM.index, df_ACSM['Org_11000'], lw = 1, label = 'Organic carbon', color = 'tab:blue')
+def plot_ACSM_BC(ax, df_ACSM, df_BC, acsm_key, n):
+    mask = df_ACSM[acsm_key] != 0
+    p1, = ax.plot(df_ACSM['Time'][mask], df_ACSM[acsm_key][mask], lw = 1, label = 'Organic carbon', color = 'tab:blue')
     ax2 = ax.twinx()
     p2, = ax2.plot(df_BC.index, df_BC['IR BCc'], lw = 1, label = 'Black carbon', color = 'tab:orange')
 
@@ -176,11 +180,11 @@ def plot_ACSM_BC(ax, df_ACSM, df_BC, n):
     ax.xaxis.set_major_formatter(formatter)
     ax2.xaxis.set_major_formatter(formatter)
 
-    ylim = np.array(ax2.get_ylim())
+    ylim = np.array(ax.get_ylim())
     ratio = ylim / np.sum(np.abs(ylim))
     scale = ratio / np.min(np.abs(ratio))
     scale = scale / n
-    ax.set_ylim(np.max(np.abs(ax.get_ylim())) * scale)
+    ax2.set_ylim(np.max(np.abs(ax2.get_ylim())) * scale)
 
     ax.tick_params(axis = 'y', labelcolor = p1.get_color())
     ax2.tick_params(axis = 'y', labelcolor = p2.get_color())
