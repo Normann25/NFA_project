@@ -53,6 +53,40 @@ def read_MS_txt(path, parent_path):
     
     return data_dict
 
+def read_ACMS_txt(path, parent_path, labels_list):
+    data_dict = {}
+
+    parentPath = os.path.abspath(parent_path)
+    if parentPath not in sys.path:
+        sys.path.insert(0, parentPath)
+    
+    files = os.listdir(path)
+    
+    for label in labels_list:
+        label_dict = {}
+        for file in files:
+            if label in file:
+                file_name = file.split('.')[0]
+                name = file_name.split('_')[0] + ' ' + file_name.split('_')[1]
+            
+                with open(os.path.join(path, file)) as f:
+                    df = pd.read_table(f, sep = '\t')
+                    df.columns = ['Time', name]
+                    df['Time'] = df['Time'].str.split().str[1] + pd.Timedelta('2 hours')
+                    df['Time'] = pd.to_timedelta(df['Time']).astype('timedelta64[s]')     # .str.split().str[1]
+                    label_dict[name] = df
+
+                merged = pd.DataFrame({'Time':[]})
+                for key in label_dict.keys():
+                    merged = pd.merge(merged, label_dict[key], on = 'Time', how = 'outer')
+                
+                for key in merged.keys():
+                    merged[key] = merged[key].fillna(0)
+
+                data_dict[label] = merged
+
+    return data_dict
+
 def read_data(path, parent_path):
     parentPath = os.path.abspath(parent_path)
     if parentPath not in sys.path:
