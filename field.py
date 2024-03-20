@@ -138,20 +138,11 @@ def read_csv_BC(path, parent_path, bc_station):
     
     return data_dict 
 
-def plot_test(ax, df):
-    df['Sum'] = df[df.keys()[2:]].sum(axis='columns')  
-
-    ax.plot(df.index, df['Sum'], lw = 1, label = 'Summed columns')
-
-    formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
-    ax.xaxis.set_major_formatter(formatter)
-
-    ax.legend(frameon = False, fontsize = 8)
-    ax.set(ylabel = 'Intensity', xlabel = 'Time')
-
-def plot_overview(ax, df, ncol):
-    for key in df.keys()[1:]:
-        ax.plot(df.index, df[key], lw = 1, label = key)
+def plot_overview(ax, df, label, df_keys, ncol):
+    for key in df_keys:
+        if label in df[key].keys():
+            mask = df[key][label] != 0
+            ax.plot(df[key]['Time'][mask], df[key][label][mask], lw = 1, label = key)
 
     formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
     ax.xaxis.set_major_formatter(formatter)
@@ -159,10 +150,12 @@ def plot_overview(ax, df, ncol):
     ax.legend(frameon = False, fontsize = 8, ncol = ncol)
     ax.set(ylabel = 'Intensity', xlabel = 'Time')
 
-def plot_PAH_ACSM(ax, df, ncol):
-    for key in df.keys()[1:]:
+def plot_PAH_ACSM(ax, df, label, df_keys, ncol):
+    for key in df_keys:
         if 'm' in key:
-            ax.plot(df.index, df[key], lw = 1, label = key)
+            if label in df[key].keys():
+                mask = df[key][label] != 0
+                ax.plot(df[key]['Time'][mask], df[key][label][mask], lw = 1, label = key)
 
     formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
     ax.xaxis.set_major_formatter(formatter)
