@@ -221,3 +221,16 @@ def plot_ACSM_BC(ax, df_ACSM, df_BC, acsm_key, n):
     ax.set_xlabel('Time')
     ax.set_ylabel('Intensity', color = p1.get_color())
     ax2.set_ylabel('Mass concentration / $\mu$g/m$^{3}$', color = p2.get_color())
+
+def plot_MS(ax, df, key, ttl):
+    width = 0.2
+
+    ax.bar(df['mass'], df[key], width)
+    
+    ax.set(xlabel = 'm/z', ylabel = 'Intensity', title = ttl)
+
+    ax.xaxis.set_minor_locator(AutoMinorLocator())
+    ax.yaxis.set_minor_locator(AutoMinorLocator())
+    ax.tick_params(axis = 'both', which = 'major', direction = 'out', bottom = True, left = True, labelsize = 8)
+    ax.tick_params(axis = 'both', which = 'minor', direction = 'out', width = 1, length = 2, bottom = True, left = True)
+    ax.yaxis.offsetText.set_fontsize(9)
