@@ -19,7 +19,7 @@ def read_NIST(path):
             df3.columns = ['mass', ('intensity' + file)]
 
             for key in df3.keys():
-                df3[key] = pd.to_numeric(df3[key])
+                df3[key] = pd.to_numeric(df3[key], errors = 'coerce')
 
             data_dict[file] = df3
     
@@ -42,12 +42,19 @@ def merge_NIST(species_list, data):
 #%%
 def plot_NIST(species_list, data, width, ax, xlim, ylim):
     merged = merge_NIST(species_list, data)
-
+    
     bottom = np.zeros(len(merged['mass']))
 
     for i, key in enumerate(merged.keys()[1:]):
-        y = merged[key] / 100
-        x = merged['mass']
+        if 'intensityChrysene.txt' in key:
+            y = merged[key] / 10
+            x = merged['mass']
+        elif 'intensityCoronene.txt' in key:
+            y = merged[key] / 10
+            x = merged['mass']
+        else:
+            y = merged[key] / 100
+            x = merged['mass']
 
         ax.bar(x, y, width, label = species_list[i], bottom = bottom)
         bottom += y
