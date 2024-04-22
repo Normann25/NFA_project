@@ -87,7 +87,7 @@ def read_ACMS_txt(path, parent_path, labels_list):
 
     return data_dict
 
-def read_data(path, parent_path):
+def read_data(path, parent_path, time_label):
     parentPath = os.path.abspath(parent_path)
     if parentPath not in sys.path:
         sys.path.insert(0, parentPath)
@@ -96,26 +96,22 @@ def read_data(path, parent_path):
     data_dict = {}
 
     for file in files:
-        name = file.split('.')[0]
+        file_name = file.split('.')[0]
+        name = file_name.split('_')[0] + ' ' + file_name.split('_')[1]
         with open(os.path.join(path, file)) as f:
-            df = pd.read_csv(f, sep = ';', decimal = ',')
+            df = pd.read_csv(f, sep = ';')
             df = df.dropna()
 
-            df['t_base'] = df['t_base'].str.split().str[1] + pd.Timedelta('2 hours')
-            # df['t_base'] = (df['t_base'].apply(lambda x: datetime.strptime(x, "%H:%M")) + pd.Timedelta("1 hour")).apply(lambda y: datetime.strftime(y, "%H:%M"))
-            df['Time'] = pd.to_timedelta(df['t_base']).astype('timedelta64[s]')     # .str.split().str[1]
-            df = df.set_index('Time')
+            df['PAH'] = pd.to_numeric(df['PAH'], errors = 'coerce')
 
-            for key in df.keys()[1:]:
-                df[key] = pd.to_numeric(df[key].str.replace(',', '.'), errors='coerce')
- 
-            # df = df.drop('t_base', axis = 'columns')
+            df[time_label] = df[time_label].str.split().str[1] + pd.Timedelta('2 hours')
+            df['Time'] = pd.to_timedelta(df[time_label]).astype('timedelta64[s]')
 
         data_dict[name] = df
     
     return data_dict
 
-def read_csv(path, parent_path):
+def read_csv(path, parent_path, time_label):
     parentPath = os.path.abspath(parent_path)
     if parentPath not in sys.path:
         sys.path.insert(0, parentPath)
@@ -124,15 +120,16 @@ def read_csv(path, parent_path):
     data_dict = {}
 
     for file in files:
-        name = file.split('.')[0]
+        file_name = file.split('.')[0]
+        name = file_name.split('_')[0] + ' ' + file_name.split('_')[1]
         with open(os.path.join(path, file)) as f:
             df = pd.read_csv(f)
             df = df.dropna()
 
-            df['t_base'] = df['t_base'].str.split().str[1] + pd.Timedelta('2 hours')
+            df[time_label] = df[time_label].str.split().str[1] + pd.Timedelta('2 hours')
             # df['t_base'] = (df['t_base'].apply(lambda x: datetime.strptime(x, "%H:%M")) + pd.Timedelta("1 hour")).apply(lambda y: datetime.strftime(y, "%H:%M"))
-            df['Time'] = pd.to_timedelta(df['t_base']).astype('timedelta64[s]')     # .str.split().str[1]
-            df = df.set_index('Time')
+            df['Time'] = pd.to_timedelta(df[time_label]).astype('timedelta64[s]')     # .str.split().str[1]
+            # df = df.set_index('Time')
 
         data_dict[name] = df
     
