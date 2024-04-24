@@ -189,7 +189,7 @@ def plot_PAH_ACSM(ax, df, key_start, colors, loc, bb2a, height, peak_idx):
     formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
     ax.xaxis.set_major_formatter(formatter)
 
-    ax.set(ylabel = 'Intensity', xlabel = 'Time')
+    ax.set(ylabel = 'PAH$_{est}$ conc. / $\mu$g/m$^{3}$', xlabel = 'Time')
 
     inset_ax = inset_axes(ax,
                         width = "40%", # width = % of parent_bbox
@@ -230,8 +230,8 @@ def plot_ACSM_BC(ax, df_ACSM, df_BC, acsm_key, n):
     ax.legend(frameon = False, fontsize = 8, handles = [p1, p2])
 
     ax.set_xlabel('Time')
-    ax.set_ylabel('Intensity', color = p1.get_color())
-    ax2.set_ylabel('Mass concentration / $\mu$g/m$^{3}$', color = p2.get_color())
+    ax.set_ylabel('Mass conc. OC / $\mu$g/m$^{3}$', color = p1.get_color())
+    ax2.set_ylabel('Mass conc. BC / $\mu$g/m$^{3}$', color = p2.get_color())
 
 def plot_MS(ax, df, key, ttl):
     width = 0.2
