@@ -6,6 +6,7 @@ from datetime import datetime
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import os, sys
 #%%
 def read_MS_txt(path, parent_path):
@@ -181,18 +182,31 @@ def plot_overview(ax, df, label, df_keys, ncol):
     ax.legend(frameon = False, fontsize = 8, ncol = ncol)
     ax.set(ylabel = 'Intensity', xlabel = 'Time')
 
-def plot_PAH_ACSM(ax, df, label, df_keys, ncol):
-    for key in df_keys:
-        if 'm' in key:
-            if label in df[key].keys():
-                mask = df[key][label] != 0
-                ax.plot(df[key]['Time'][mask], df[key][label][mask], lw = 1, label = key)
+def plot_PAH_ACSM(ax, df, key_start, colors, loc, bb2a, height, peak_idx):
+    for i, key in enumerate(df.keys()[key_start:]):
+        ax.plot(df['Time'], df[key], lw = 1, color = colors[i])
 
     formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
     ax.xaxis.set_major_formatter(formatter)
 
-    ax.legend(frameon = False, fontsize = 8, ncol = ncol)
     ax.set(ylabel = 'Intensity', xlabel = 'Time')
+
+    inset_ax = inset_axes(ax,
+                        width = "40%", # width = % of parent_bbox
+                        height = height, # height : 1 inch
+                        loc = loc,
+                        bbox_to_anchor = bb2a,
+                        bbox_transform = ax.transAxes) # placement in figure
+
+    for i, key in enumerate(df.keys()[key_start+1:]):
+        inset_ax.plot(df['Time'][peak_idx[0]:peak_idx[1]], df[key][peak_idx[0]:peak_idx[1]], lw = 1, color = colors[i+1])
+    
+    inset_ax.set_ylabel(None)
+    inset_ax.set_xlabel(None)
+
+    inset_ax.xaxis.set_major_formatter(formatter)
+
+    inset_ax.legend().set_visible(False)
 
 def plot_ACSM_BC(ax, df_ACSM, df_BC, acsm_key, n):
     mask = df_ACSM[acsm_key] != 0
