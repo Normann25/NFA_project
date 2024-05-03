@@ -159,7 +159,7 @@ def read_csv_BC(path, parent_path, bc_station):
                             new_df[col] = df[col]
                         
                         new_df['Time'] = pd.to_timedelta(new_df['Time local (hh:mm:ss)']).astype('timedelta64[s]')  # .str.split().str[1]
-                        new_df = new_df.set_index('Time')
+                        # new_df = new_df.set_index('Time')
 
                         new_df = new_df.dropna()
                         for key in new_df.keys():
@@ -212,7 +212,7 @@ def plot_ACSM_BC(ax, df_ACSM, df_BC, acsm_key, n):
     mask = df_ACSM[acsm_key] != 0
     p1, = ax.plot(df_ACSM['Time'][mask], df_ACSM[acsm_key][mask], lw = 1, label = 'Organic carbon', color = 'tab:blue')
     ax2 = ax.twinx()
-    p2, = ax2.plot(df_BC.index, df_BC['IR BCc'], lw = 1, label = 'Black carbon', color = 'tab:orange')
+    p2, = ax2.plot(df_BC['Time'], df_BC['IR BCc'], lw = 1, label = 'Black carbon', color = 'tab:orange')
 
     formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
     ax.xaxis.set_major_formatter(formatter)
