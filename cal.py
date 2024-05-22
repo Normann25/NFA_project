@@ -28,18 +28,22 @@ def read_data(path, parent_path):
 
     mask = new_df['mass'] >= 60
     new_df = new_df[mask]
+
+    for key in new_df.keys()[1:]:
+        mol_idx = new_df[key].idxmax()
+        new_df[key] = (new_df[key] / new_df[key][mol_idx]) * 100
     
     return new_df
 
-def Fracmentation_factor(data, molecular_weights):
+def Fracmentation_factor(species_list, data, molecular_weights):
     sums = pd.DataFrame(columns = ['Species', 'Molecular weight', 'Full sum', 'MI', 'FF', 'MI fraction'])
 
-    full_sum = np.zeros(len(data.keys()[1:]))
-    MI_frac = np.zeros(len(data.keys()[1:]))
-    sum_MI = np.zeros(len(data.keys()[1:]))
-    FF = np.zeros(len(data.keys()[1:]))
+    full_sum = np.zeros(len(species_list))
+    MI_frac = np.zeros(len(species_list))
+    sum_MI = np.zeros(len(species_list))
+    FF = np.zeros(len(species_list))
 
-    for j, key in enumerate(data.keys()[1:]):
+    for j, key in enumerate(species_list):
         mol_idx = data[key].idxmax()
 
         main = []
@@ -53,8 +57,7 @@ def Fracmentation_factor(data, molecular_weights):
         sum_MI[j] += np.sum(main)
         FF[j] += full_sum[j] / sum_MI[j]
     
-    for j, f in enumerate(full_sum):
-        new_row = {'Species': key, 'Molecular weight': molecular_weights[j], 'Full sum': f, 'MI': sum_MI[j], 'FF': FF[j], 'MI fraction': MI_frac[j]}
+        new_row = {'Species': key, 'Molecular weight': molecular_weights[j], 'Full sum': full_sum[j], 'MI': sum_MI[j], 'FF': FF[j], 'MI fraction': MI_frac[j]}
         sums = pd.concat([sums, pd.DataFrame([new_row])], ignore_index=True)
 
     sums = sums.set_index('Species')
