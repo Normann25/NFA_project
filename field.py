@@ -208,15 +208,21 @@ def plot_PAH_ACSM(ax, df, key_start, colors, loc, bb2a, height, peak_idx):
 
     inset_ax.legend().set_visible(False)
 
-def plot_ACSM_BC(ax, df_ACSM, df_BC, acsm_key, n):
+def plot_ACSM_BC(ax, df_ACSM, df_BC, acsm_key, BC_mask, n):
     mask = df_ACSM[acsm_key] != 0
     p1, = ax.plot(df_ACSM['Time'][mask], df_ACSM[acsm_key][mask], lw = 1, label = 'Organic carbon', color = 'tab:blue')
     ax2 = ax.twinx()
-    p2, = ax2.plot(df_BC['Time'], df_BC['IR BCc'], lw = 1, label = 'Black carbon', color = 'tab:orange')
+    if 'Vesterbrogade' in acsm_key:
+        p2, = ax2.plot(df_BC['Time'][BC_mask], df_BC['IR BCc'][BC_mask], lw = 1, label = 'Black carbon', color = 'k')
+        ax2.plot(df_BC['Time'], df_BC['IR BCc'], lw = 1, label = None, color = 'k', ls = '--')
+    else:
+        p2, = ax2.plot(df_BC['Time'], df_BC['IR BCc'], lw = 1, label = 'Black carbon', color = 'k')
 
     formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
     ax.xaxis.set_major_formatter(formatter)
+    ax.set_xticklabels(ax.get_xticklabels(), size = 8)
     ax2.xaxis.set_major_formatter(formatter)
+    ax2.set_xticklabels(ax2.get_xticklabels(), size = 8)
 
     ylim = np.array(ax.get_ylim())
     ratio = ylim / np.sum(np.abs(ylim))
@@ -224,14 +230,14 @@ def plot_ACSM_BC(ax, df_ACSM, df_BC, acsm_key, n):
     scale = scale / n
     ax2.set_ylim(np.max(np.abs(ax2.get_ylim())) * scale)
 
-    ax.tick_params(axis = 'y', labelcolor = p1.get_color())
-    ax2.tick_params(axis = 'y', labelcolor = p2.get_color())
+    ax.tick_params(axis = 'y', labelcolor = p1.get_color(), labelsize = 8)
+    ax2.tick_params(axis = 'y', labelcolor = p2.get_color(), labelsize = 8)
 
     ax.legend(frameon = False, fontsize = 8, handles = [p1, p2])
 
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Mass conc. OC / $\mu$g/m$^{3}$', color = p1.get_color())
-    ax2.set_ylabel('Mass conc. BC / $\mu$g/m$^{3}$', color = p2.get_color())
+    ax.set_xlabel('Time', fontsize = 8)
+    ax.set_ylabel('OC / $\mu$g/m$^{3}$', color = p1.get_color(), fontsize = 8)
+    ax2.set_ylabel('BC / $\mu$g/m$^{3}$', color = p2.get_color(), fontsize = 8)
 
 def plot_MS(ax, df, key, ttl):
     width = 0.2
