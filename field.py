@@ -291,3 +291,5 @@ def plot_105_183(ax, acsm_dict, acsm_keys, bc_dict, n, peak_int):
         ax[i].set_xlabel('Time', fontsize = 8)
         ax[i].set_ylabel('OC / $\mu$g/m$^{3}$', color = 'k', fontsize = 8)
         ax2.set_ylabel('BC / $\mu$g/m$^{3}$', color = p3.get_color(), fontsize = 8)
+
+        ax[i].set_title(acsm_keys[i], fontsize = 9)
