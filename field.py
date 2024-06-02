@@ -252,26 +252,30 @@ def plot_MS(ax, df, key, ttl):
     ax.tick_params(axis = 'both', which = 'minor', direction = 'out', width = 1, length = 2, bottom = True, left = True)
     ax.yaxis.offsetText.set_fontsize(9)
 
-def plot_105_183(ax, acsm_dict, df_key, bc_dict, n, peak_int, label_int):
-    df1 = acsm_dict[df_key[0]]
-    df2 = acsm_dict[df_key[1]]
+def plot_105_183(ax, acsm_dict, acsm_keys, bc_dict, n, peak_int):
+    df1 = acsm_dict['m105']
+    df2 = acsm_dict['m183']
 
     for i, key in enumerate(bc_dict.keys()):
-        mask1 = df1[df1.keys()[i+label_int[0]]] != 0
-        mask2 = df2[df2.keys()[i+label_int[0]]] != 0
+        mask1 = df1[acsm_keys[i]] != 0
+        mask2 = df2[acsm_keys[i]] != 0
 
-        x1, y1 = df1['Time'][mask1][peak_int[i][0]:peak_int[i][1]], df1[df1.keys()[i+label_int[0]]][mask1][peak_int[i][0]:peak_int[i][1]]
-        x2, y2 = df2['Time'][mask2][peak_int[i][0]:peak_int[i][1]], df2[df2.keys()[i+label_int[0]]][mask2][peak_int[i][0]:peak_int[i][1]]
+        x1, y1 = df1['Time'][mask1][peak_int[i][0]:peak_int[i][1]], df1[acsm_keys[i]][mask1][peak_int[i][0]:peak_int[i][1]]
+        x2, y2 = df2['Time'][mask2][peak_int[i][0]:peak_int[i][1]], df2[acsm_keys[i]][mask2][peak_int[i][0]:peak_int[i][1]]
 
-        p1, = ax[i].plot(x1, y1, lw = 1, label = df_key[0], color = 'blue')
-        p2, = ax[i].plot(x2, y2, lw = 1, label = df_key[1], color = 'green')
+        p1, = ax[i].plot(x1, y1, lw = 1, label = 'm/z 105', color = 'blue')
+        p2, = ax[i].plot(x2, y2, lw = 1, label = 'm/z 183', color = 'green')
+
         ax2 = ax[i].twinx()
-        x3, y3 = bc_dict[key]['Time'][peak_int[i+label_int[1]][0]:peak_int[i+label_int[1]][1]], bc_dict[key]['IR BCc'][peak_int[i+label_int[1]][0]:peak_int[i+label_int[1]][1]]
-        p3, = ax2.plot(x3, y3, lw = 1, label = 'Black carbon', color = 'tab:orange')
+        
+        x3, y3 = bc_dict[key]['Time'][peak_int[i][2]:peak_int[i][3]], bc_dict[key]['IR BCc'][peak_int[i][2]:peak_int[i][3]]
+        p3, = ax2.plot(x3, y3, lw = 1, label = 'BC', color = 'k', zorder = -10)
 
         formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
         ax[i].xaxis.set_major_formatter(formatter)
+        ax[i].set_xticklabels(ax[i].get_xticklabels(), size = 8)
         ax2.xaxis.set_major_formatter(formatter)
+        ax2.set_xticklabels(ax2.get_xticklabels(), size = 8)
 
         ylim = np.array(ax[i].get_ylim())
         ratio = ylim / np.sum(np.abs(ylim))
@@ -279,11 +283,11 @@ def plot_105_183(ax, acsm_dict, df_key, bc_dict, n, peak_int, label_int):
         scale = scale / n[i]
         ax2.set_ylim(np.max(np.abs(ax2.get_ylim())) * scale)
 
-        ax[i].tick_params(axis = 'y', labelcolor = 'k')
-        ax2.tick_params(axis = 'y', labelcolor = p3.get_color())
+        ax[i].tick_params(axis = 'y', labelcolor = 'k', size = 8)
+        ax2.tick_params(axis = 'y', labelcolor = p3.get_color(), size = 8)
 
         ax[i].legend(frameon = False, fontsize = 8, handles = [p1, p2, p3])
 
-        ax[i].set_xlabel('Time')
-        ax[i].set_ylabel('Mass conc. OC / $\mu$g/m$^{3}$', color = 'k')
-        ax2.set_ylabel('Mass conc. BC / $\mu$g/m$^{3}$', color = p3.get_color())
+        ax[i].set_xlabel('Time', fontsize = 8)
+        ax[i].set_ylabel('OC / $\mu$g/m$^{3}$', color = 'k', fontsize = 8)
+        ax2.set_ylabel('BC / $\mu$g/m$^{3}$', color = p3.get_color(), fontsize = 8)
