@@ -131,7 +131,11 @@ def linear_fit(x, y, a_guess, b_guess):
     
     return a_fit, b_fit, squares_fit, Ndof_fit, R2
 
-def plot_with_LinReg(ax, data_dict, df_keys, a_guess, b_guess, lbl, clr, ax_labels):
+def plot_with_LinReg(ax, data_dict, df_keys, x_plot, a_guess, b_guess, lbl, clr, frame, ax_labels):
+    a_array = np.zeros(len(a_guess))
+    b_array = np.zeros(len(b_guess))
+    df_fitted = pd.DataFrame({'MW': x_plot})
+
     for i, key in enumerate(data_dict.keys()):
         df = data_dict[key]
         x, y = df[df_keys[i][0]], df[df_keys[i][1]]
@@ -139,11 +143,14 @@ def plot_with_LinReg(ax, data_dict, df_keys, a_guess, b_guess, lbl, clr, ax_labe
         lbl_fit = lbl[i] + ' fit'
 
         a, b, squares, ndof, R2 = linear_fit(x, y, a_guess[i], b_guess[i])
-        y_fit = a*x + b
+        y_fit = a*x_plot + b
+        df_fitted[lbl[i]] = y_fit
 
-        ax.plot(x, y_fit, label = lbl_fit, color = clr[i], lw = 1.2)
+        ax.plot(x_plot, y_fit, label = lbl_fit, color = clr[i], lw = 1.2)
         ax.scatter(x, y, label = lbl[i], color = clr[i], s = 10)
 
-    ax.legend(fontsize = 8)
+    ax.legend(fontsize = 8, frameon = frame)
     ax.tick_params(axis = 'both', which = 'major', direction = 'out', bottom = True, left = True, labelsize = 8)
     ax.set(xlabel = ax_labels[0], ylabel = ax_labels[1])
+
+    return a_array, b_array, df_fitted
