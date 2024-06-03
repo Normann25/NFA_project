@@ -182,21 +182,21 @@ def plot_overview(ax, df, label, df_keys, ncol):
     ax.legend(frameon = False, fontsize = 8, ncol = ncol)
     ax.set(ylabel = 'Intensity', xlabel = 'Time')
 
-def plot_PAH_ACSM(ax, data_dict, dict_keys, colors):
+def plot_PAH_ACSM(ax, data_dict, dict_keys, colors, peak_int):
     for i, dict_key in enumerate(dict_keys):
         df = data_dict[dict_key]
         for j, key in enumerate(df.keys()[1:]):
-            ax[i][0].plot(df['Time'], df[key], lw = 1, color = colors[j])
+            ax[i][0].plot(df['Time'][peak_int[i][0]:peak_int[i][1]], df[key][peak_int[i][0]:peak_int[i][1]], lw = 1, color = colors[j])
 
-            if 'm' in key:
-                ax[i][1].plot(df['Time'], df[key], lw = 1, color = colors[j])
+            if 'm/z' in key:
+                ax[i][1].plot(df['Time'][peak_int[i][2]:peak_int[i][3]], df[key][peak_int[i][2]:peak_int[i][3]], lw = 1, color = colors[j])
 
         formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
         ax[i][0].xaxis.set_major_formatter(formatter)
         ax[i][0].tick_params(axis = 'both', which = 'major', direction = 'out', bottom = True, left = True, labelsize = 8)
 
         ax[i][0].set_xlabel('Time', fontsize = 8)
-        ax[i][0].set_ylabel('PAH$_{est}$ conc. / $\mu$g/m$^{3}$', fontsize = 8)
+        ax[i][0].set_ylabel('PAH$_{est}$ / $\mu$g/m$^{3}$', fontsize = 8)
         ax[i][0].set_title(dict_key, fontsize = 9)
 
         formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
@@ -204,7 +204,7 @@ def plot_PAH_ACSM(ax, data_dict, dict_keys, colors):
         ax[i][1].tick_params(axis = 'both', which = 'major', direction = 'out', bottom = True, left = True, labelsize = 8)
 
         ax[i][1].set_xlabel('Time', fontsize = 8)
-        ax[i][1].set_ylabel('PAH$_{est}$ conc. / $\mu$g/m$^{3}$', fontsize = 8)
+        ax[i][1].set_ylabel('PAH$_{est}$ / $\mu$g/m$^{3}$', fontsize = 8)
         ax[i][1].set_title(dict_key, fontsize = 9)
 
         
