@@ -143,6 +143,8 @@ def plot_with_LinReg(ax, data_dict, df_keys, x_plot, a_guess, b_guess, lbl, clr,
         lbl_fit = lbl[i] + ' fit'
 
         a, b, squares, ndof, R2 = linear_fit(x, y, a_guess[i], b_guess[i])
+        a_array[i] = a
+        b_array[i] = b
         y_fit = a*x_plot + b
         df_fitted[lbl[i]] = y_fit
 
