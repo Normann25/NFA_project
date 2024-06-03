@@ -182,7 +182,35 @@ def plot_overview(ax, df, label, df_keys, ncol):
     ax.legend(frameon = False, fontsize = 8, ncol = ncol)
     ax.set(ylabel = 'Intensity', xlabel = 'Time')
 
-def plot_PAH_ACSM(ax, df, key_start, colors, loc, bb2a, height, peak_idx):
+def plot_PAH_ACSM(ax, data_dict, dict_keys, colors):
+    for i, dict_key in enumerate(dict_keys):
+        df = data_dict[dict_key]
+        for j, key in enumerate(df.keys()[1:]):
+            ax[i][0].plot(df['Time'], df[key], lw = 1, color = colors[j])
+
+            if 'm' in key:
+                ax[i][1].plot(df['Time'], df[key], lw = 1, color = colors[j])
+
+        formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
+        ax[i][0].xaxis.set_major_formatter(formatter)
+        ax[i][0].tick_params(axis = 'both', which = 'major', direction = 'out', bottom = True, left = True, labelsize = 8)
+
+        ax[i][0].set_xlabel('Time', fontsize = 8)
+        ax[i][0].set_ylabel('PAH$_{est}$ conc. / $\mu$g/m$^{3}$', fontsize = 8)
+        ax[i][0].set_title(dict_key, fontsize = 9)
+
+        formatter = FuncFormatter(lambda s, x: time.strftime('%H:%M', time.gmtime(s)))
+        ax[i][1].xaxis.set_major_formatter(formatter)
+        ax[i][1].tick_params(axis = 'both', which = 'major', direction = 'out', bottom = True, left = True, labelsize = 8)
+
+        ax[i][1].set_xlabel('Time', fontsize = 8)
+        ax[i][1].set_ylabel('PAH$_{est}$ conc. / $\mu$g/m$^{3}$', fontsize = 8)
+        ax[i][1].set_title(dict_key, fontsize = 9)
+
+        
+
+
+def plot_PAH_ACSM_wInset(ax, df, key_start, colors, loc, bb2a, height, peak_idx):
     for i, key in enumerate(df.keys()[key_start:]):
         ax.plot(df['Time'], df[key], lw = 1, color = colors[i])
 
