@@ -242,6 +242,12 @@ def mean_conc(data_dict, timestamps, path, parent_path):
         new_df['Traffic after (mean)'] = traffic_after_int
         new_df['Asphalt peak (max)'] = asphalt_peak_max
 
+        new_row = {'PAHs': 'Total'}
+        for j, key in enumerate(new_df.keys()[1:]):
+            new_row[key] = (np.sum(new_df[key]))
+
+        new_df = pd.concat([new_df, pd.DataFrame([new_row])])
+
         name = path + dict_key + '.csv'
         new_df.to_csv(name)
 
