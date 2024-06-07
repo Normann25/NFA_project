@@ -8,7 +8,7 @@ from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import os, sys
 #%%
-def read_data(path, parent_path):
+def read_cal_spec(path, parent_path):
     new_df = pd.DataFrame({'mass':[]})
 
     parentPath = os.path.abspath(parent_path)
