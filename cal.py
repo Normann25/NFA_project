@@ -242,7 +242,7 @@ def mean_conc(data_dict, timestamps, path, parent_path):
         new_df['Traffic after (mean)'] = traffic_after_int
         new_df['Asphalt peak (max)'] = asphalt_peak_max
 
-        name = path + dict_key
+        name = path + dict_key + '.csv'
         new_df.to_csv(name)
 
         new_dict[dict_key] = new_df
