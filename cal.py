@@ -162,17 +162,22 @@ def PAH_concentration(data_dict, FF):
 
     for dict_key in data_dict.keys():
         df = data_dict[dict_key].dropna()
-        new_df = pd.DataFrame({'Time': df['Time']})
+        df_v1 = pd.DataFrame({'Time': df['Time']})
+        df_v2 = pd.DataFrame({'Time': df['Time']})
+        df_v3 = pd.DataFrame({'Time': df['Time']})
 
         for idx in FF.index:
             RIE = 0.12*np.sqrt(FF['Mw'][idx])
+
             for key in df.keys()[2:]:
                 if str(FF['Mw'][idx]) in key:
-                    new_df[idx + ' ' + 'v1'] = df[key] * (1.4/RIE) * FF['FF scaled v1'][idx]
-                    new_df[idx + ' ' + 'v2'] = df[key] * (1.4/RIE) * FF['FF scaled v2'][idx]
-                    new_df[idx + ' ' + 'v3'] = df[key] * (1.4/RIE) * FF['FF scaled v3'][idx]
+                    df_v1[idx] = df[key] * (1.4/RIE) * FF['FF scaled v1'][idx]
+                    df_v2[idx] = df[key] * (1.4/RIE) * FF['FF scaled v2'][idx]
+                    df_v3[idx] = df[key] * (1.4/RIE) * FF['FF scaled v3'][idx]
         
-        new_dict[dict_key] = new_df
+        new_dict[dict_key + ' ' + 'v1'] = df_v1
+        new_dict[dict_key + ' ' + 'v2'] = df_v2
+        new_dict[dict_key + ' ' + 'v3'] = df_v3
 
     return new_dict
 
