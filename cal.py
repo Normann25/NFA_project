@@ -2,8 +2,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import seaborn as sns
 from iminuit import Minuit
+from scipy import integrate
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import os, sys
@@ -156,3 +156,89 @@ def plot_with_LinReg(ax, data_dict, df_keys, x_plot, a_guess, b_guess, lbl, clr,
     ax.set(xlabel = ax_labels[0], ylabel = ax_labels[1])
 
     return a_array, b_array, df_fitted
+
+def PAH_concentration(data_dict, FF):
+    new_dict = {}
+
+    for dict_key in data_dict.keys():
+        df = data_dict[dict_key].dropna()
+        new_df = pd.DataFrame({'Time': df['Time']})
+
+        for idx in FF.index:
+            RIE = 0.12*np.sqrt(FF['Mw'][idx])
+            for key in df.keys()[2:]:
+                if str(FF['Mw'][idx]) in key:
+                    new_df[idx + ' ' + 'v1'] = df[key] * (1.4/RIE) * FF['FF scaled v1'][idx]
+                    new_df[idx + ' ' + 'v2'] = df[key] * (1.4/RIE) * FF['FF scaled v2'][idx]
+                    new_df[idx + ' ' + 'v3'] = df[key] * (1.4/RIE) * FF['FF scaled v3'][idx]
+        
+        new_dict[dict_key] = new_df
+
+    return new_dict
+
+def mean_conc(data_dict, timestamps, path, parent_path):
+    parentPath = os.path.abspath(parent_path)
+    if parentPath not in sys.path:
+        sys.path.insert(0, parentPath)
+
+    new_dict = {}
+
+    for i, dict_key in enumerate(data_dict.keys()):
+        df = data_dict[dict_key].dropna()
+        new_df = pd.DataFrame({'PAHs': df.keys()[1:]})
+
+        idx = []
+        for j, time in enumerate(df['Time']):
+            for t in timestamps[i]:
+                if t in str(time):
+                    idx.append(j)
+
+        full_sec = df['Time'][int(len(df['Time']))-1] - df['Time'][0]
+        before_sec = df['Time'][idx[1]] - df['Time'][idx[0]]
+        asphalt_sec = df['Time'][idx[3]] - df['Time'][idx[2]]
+        ap_sec = df['Time'][idx[5]] - df['Time'][idx[4]]
+        after_sec = df['Time'][idx[7]] - df['Time'][idx[6]]
+
+        full_conc_int = np.zeros(len(df.keys()[1:]))
+        traffic_before_int = np.zeros(len(df.keys()[1:]))
+        asphalt_peak_int = np.zeros(len(df.keys()[1:]))
+        after_AP_int = np.zeros(len(df.keys()[1:]))
+        traffic_after_int = np.zeros(len(df.keys()[1:]))
+        full_conc_mean = np.zeros(len(df.keys()[1:]))
+        traffic_before_mean = np.zeros(len(df.keys()[1:]))
+        asphalt_peak_mean = np.zeros(len(df.keys()[1:]))
+        after_AP_mean = np.zeros(len(df.keys()[1:]))
+        traffic_after_mean = np.zeros(len(df.keys()[1:]))
+        asphalt_peak_max = np.zeros(len(df.keys()[1:]))
+
+        for j, key in enumerate(df.keys()[1:]):
+            full_conc_int[j] = integrate.trapezoid(df[key], df['Time']) / full_sec
+            traffic_before_int[j] = integrate.trapezoid(df[key][idx[0]:idx[1]+1], df['Time'][idx[0]:idx[1]+1]) / before_sec
+            asphalt_peak_int[j] = integrate.trapezoid(df[key][idx[2]:idx[3]+1], df['Time'][idx[2]:idx[3]+1]) / asphalt_sec
+            after_AP_int[j] = integrate.trapezoid(df[key][idx[4]:idx[5]+1], df['Time'][idx[4]:idx[5]+1]) / ap_sec
+            traffic_after_int[j] = integrate.trapezoid(df[key][idx[6]:idx[7]+1], df['Time'][idx[6]:idx[7]+1]) / after_sec
+            full_conc_mean[j] = np.sum(df[key]) / len(df[key])
+            traffic_before_mean[j] = np.sum(df[key][idx[0]:idx[1]+1]) / len(df[key][idx[0]:idx[1]+1])
+            asphalt_peak_mean[j] = np.sum(df[key][idx[2]:idx[3]+1]) / len(df[key][idx[2]:idx[3]+1])
+            after_AP_mean[j] = np.sum(df[key][idx[4]:idx[5]+1]) / len(df[key][idx[4]:idx[5]+1])
+            traffic_after_mean[j] = np.sum(df[key][idx[6]:idx[7]+1]) / len(df[key][idx[6]:idx[7]+1])
+            asphalt_peak_max[j] = max(df[key][idx[2]:idx[3]+1])
+        
+        new_df['Full (integrated)'] = full_conc_int
+        new_df['Traffic before (integrated)'] = traffic_before_int
+        new_df['Asphalt peak (integrated)'] = asphalt_peak_int
+        new_df['After AP (integrated)'] = after_AP_int
+        new_df['Traffic after (integrated)'] = traffic_after_int
+        new_df['Full (mean)'] = full_conc_int
+        new_df['Traffic before (mean)'] = traffic_before_int
+        new_df['Asphalt peak (mean)'] = asphalt_peak_int
+        new_df['After AP (mean)'] = after_AP_int
+        new_df['Traffic after (mean)'] = traffic_after_int
+        new_df['Asphalt peak (max)'] = asphalt_peak_max
+
+        name = path + dict_key
+        new_df.to_csv(name)
+
+        new_dict[dict_key] = new_df
+    
+    return new_dict
