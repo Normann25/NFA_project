@@ -168,6 +168,7 @@ def PAH_concentration(data_dict, FF):
 
         for idx in FF.index:
             RIE = 0.12*np.sqrt(FF['Mw'][idx])
+            # print(RIE)
 
             for key in df.keys()[2:]:
                 if str(FF['Mw'][idx]) in key:

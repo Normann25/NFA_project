@@ -83,6 +83,8 @@ def read_ACMS_txt(path, parent_path, labels_list):
                 
                 for key in merged.keys():
                     merged[key] = merged[key].fillna(0)
+                
+                merged.sort_values(by = 'Time', ignore_index = True)
 
                 data_dict[label] = merged
 
