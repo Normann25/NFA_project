@@ -240,7 +240,7 @@ def plot_PAH_ACSM_wInset(ax, df, key_start, colors, loc, bb2a, height, peak_idx)
 
 def plot_ACSM_BC(ax, df_ACSM, df_BC, acsm_key, BC_mask, n):
     mask = df_ACSM[acsm_key] != 0
-    p1, = ax.plot(df_ACSM['Time'][mask], df_ACSM[acsm_key][mask], lw = 1, label = 'Organic carbon', color = 'tab:blue')
+    p1, = ax.plot(df_ACSM['Time'][mask], df_ACSM[acsm_key][mask], lw = 1, label = 'Organic aerosol', color = 'tab:blue')
     ax2 = ax.twinx()
     if 'Vesterbrogade' in acsm_key:
         p2, = ax2.plot(df_BC['Time'][BC_mask], df_BC['IR BCc'][BC_mask], lw = 1, label = 'Black carbon', color = 'k')
@@ -266,7 +266,7 @@ def plot_ACSM_BC(ax, df_ACSM, df_BC, acsm_key, BC_mask, n):
     ax.legend(frameon = False, fontsize = 8, handles = [p1, p2])
 
     ax.set_xlabel('Time', fontsize = 8)
-    ax.set_ylabel('OC / $\mu$g/m$^{3}$', color = p1.get_color(), fontsize = 8)
+    ax.set_ylabel('Org / $\mu$g/m$^{3}$', color = p1.get_color(), fontsize = 8)
     ax2.set_ylabel('BC / $\mu$g/m$^{3}$', color = p2.get_color(), fontsize = 8)
 
 def plot_MS(ax, df, key, ttl):
@@ -319,7 +319,7 @@ def plot_105_183(ax, acsm_dict, acsm_keys, bc_dict, n, peak_int):
         ax[i].legend(frameon = False, fontsize = 8, handles = [p1, p2, p3])
 
         ax[i].set_xlabel('Time', fontsize = 8)
-        ax[i].set_ylabel('OC / $\mu$g/m$^{3}$', color = 'k', fontsize = 8)
+        ax[i].set_ylabel('Org / $\mu$g/m$^{3}$', color = 'k', fontsize = 8)
         ax2.set_ylabel('BC / $\mu$g/m$^{3}$', color = p3.get_color(), fontsize = 8)
 
         ax[i].set_title(acsm_keys[i], fontsize = 9)
